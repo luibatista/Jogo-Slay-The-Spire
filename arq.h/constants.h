@@ -35,4 +35,10 @@ typedef enum {
   MOVE_RIGHT = 1,
 } CursorMovementDirection;
 
+typedef enum {
+    ESTADO_MENU,
+    ESTADO_JOGANDO,
+    ESTADO_GAME_OVER
+} EstadoJogo;
+
 #endif

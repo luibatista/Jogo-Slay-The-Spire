@@ -21,4 +21,6 @@ void Render(Renderer* renderer, Jogador* jogador, Inimigo* inimigos, int qtd_ini
 
 void ClearRenderer(Renderer* renderer);
 
+void RenderMenu(Renderer* renderer);
+
 #endif

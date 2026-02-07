@@ -168,3 +168,43 @@ void ClearRenderer(Renderer* renderer) {
   al_destroy_bitmap(renderer->display_buffer);
   al_destroy_font(renderer->font);
 }
+
+void RenderMenu(Renderer* renderer) {
+    al_clear_to_color(al_map_rgb(30, 20, 40));
+
+    DrawScaledText(renderer->font, al_map_rgb(255, 215, 0), 
+                   DISPLAY_WIDTH/2, 100, 
+                   5.0, 5.0, ALLEGRO_ALIGN_CENTRE, "SLAY THE SPIRE (CLONE)");
+
+    float x_mec = 200;
+    float y = 300;
+    
+    DrawScaledText(renderer->font, al_map_rgb(200, 200, 255), x_mec, y, 2.5, 2.5, ALLEGRO_ALIGN_CENTRE, "--- MECANICAS ---");
+    y += 50;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "ENERGIA: Voce tem 3 por turno");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "CARTAS: Ataque ou Defesa");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "ESCUDO: Protege contra dano");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "INIMIGOS: Observe a intencao!");
+
+    float x_ctrl = DISPLAY_WIDTH - 300;
+    y = 300;
+
+    DrawScaledText(renderer->font, al_map_rgb(200, 200, 255), x_ctrl, y, 2.5, 2.5, ALLEGRO_ALIGN_CENTRE, "--- CONTROLES ---");
+    y += 50;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ SETAS < > ] : Selecionar Carta");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ SETAS ^ v ] : Selecionar Alvo");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ ENTER ] : Jogar Carta");
+    y += 40;
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ E ] : Encerrar Turno");
+
+    DrawScaledText(renderer->font, al_map_rgb(0, 255, 0), 
+                   DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 100, 
+                   3.0, 3.0, ALLEGRO_ALIGN_CENTRE, "PRESSIONE [ ENTER ] PARA COMECAR");
+
+    al_flip_display();
+}

@@ -13,7 +13,8 @@
 #include "jogador.h"
 #include "inimigo.h"
 
-typedef enum { TURN_PLAYER, TURN_ENEMY, GAME_OVER, VICTORY } GameState;
+// ADICIONADO "MENU" AQUI
+typedef enum { MENU, TURN_PLAYER, TURN_ENEMY, GAME_OVER, VICTORY } GameState;
 
 void comprar_cartas(Jogador* p, int qtd) {
     for(int i=0; i<qtd; i++) {
@@ -58,9 +59,9 @@ void definir_intencoes(Inimigo* inimigos, int qtd) {
         if (rand() % 2 == 0) {
             inimigos[i].intencao_atual = INTENCAO_ATACAR;
             if (inimigos[i].vida_max > 40)
-                 inimigos[i].valor_acao = 10 + (rand() % 10); // 10 a 19
+                 inimigos[i].valor_acao = 10 + (rand() % 10); 
             else
-                 inimigos[i].valor_acao = 5 + (rand() % 6);   // 5 a 10
+                 inimigos[i].valor_acao = 5 + (rand() % 6);   
         } else {
             inimigos[i].intencao_atual = INTENCAO_DEFENDER;
             inimigos[i].valor_acao = 5 + (rand() % 10);
@@ -97,7 +98,8 @@ int main() {
     al_register_event_source(queue, al_get_display_event_source(renderer.display));
 
     // ---------------------------------------------- JOGADOR ----------------------------------------------------------
-    GameState estado_atual = TURN_PLAYER;
+    // MUDANÇA: COMEÇA NO MENU
+    GameState estado_atual = MENU;
 
     Jogador player;
     player.vida_max = 100;
@@ -150,12 +152,12 @@ int main() {
 
         if (event.type == ALLEGRO_EVENT_TIMER) {
             redraw = 1;
-            if (player.vida <= 0) estado_atual = GAME_OVER;
+            if (estado_atual != MENU && player.vida <= 0) estado_atual = GAME_OVER;
 
             int vivos = 0;
             for(int i=0; i<qtd_inimigos; i++) if(inimigos[i].vida > 0) vivos++;
 
-            if(vivos == 0) {
+            if(vivos == 0 && estado_atual != MENU) {
                 if (combate_atual < 10) {
                     combate_atual++;
                     for(int i=0; i<qtd_inimigos; i++) {
@@ -180,7 +182,13 @@ int main() {
         } else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             done = 1;
         } else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-            if (estado_atual == TURN_PLAYER) {
+            
+            if (estado_atual == MENU) {
+                if (event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                    estado_atual = TURN_PLAYER;
+                }
+            }
+            else if (estado_atual == TURN_PLAYER) {
                 switch(event.keyboard.keycode) {
 
                     //-------------------------- MOVIMENTAÇÃO DE CARTAS E ALVOS --------------------------------
@@ -276,9 +284,9 @@ int main() {
 
                     default:
                         break;
-                } // end switch
-            } // end if TURN_PLAYER
-        } // end KEY_DOWN
+                } 
+            } 
+        } 
 
         if (estado_atual == TURN_ENEMY) {
 
@@ -312,7 +320,11 @@ int main() {
         }
 
         if (redraw && al_is_event_queue_empty(queue)) {
-            if (estado_atual == GAME_OVER) {
+            if (estado_atual == MENU) {
+                RenderMenu(&renderer);
+            }
+            // -----------------------
+            else if (estado_atual == GAME_OVER) {
                 al_clear_to_color(al_map_rgb(0, 0, 0));
                 DrawScaledText(renderer.font, al_map_rgb(255, 0, 0), (DISPLAY_WIDTH/2)/4.0, (DISPLAY_HEIGHT/2)/4.0, 4, 4, ALLEGRO_ALIGN_CENTER, "GAME OVER");
                 al_flip_display();
@@ -327,7 +339,7 @@ int main() {
             }
             redraw = 0;
         }
-    } // end while
+    } 
 
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
