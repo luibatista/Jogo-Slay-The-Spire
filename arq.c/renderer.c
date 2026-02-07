@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include "constants.h"
 
+#define COLOR_BG al_map_rgb(30, 25, 40)
+#define COLOR_GOLD al_map_rgb(255, 215, 0)
+#define COLOR_KEY_FACE al_map_rgb(220, 220, 230)
+#define COLOR_KEY_SHADOW al_map_rgb(100, 100, 110)
+#define COLOR_KEY_TEXT al_map_rgb(40, 40, 50)
+#define COLOR_DESC_TEXT al_map_rgb(200, 200, 255)
+
 void DrawScaledText(ALLEGRO_FONT* font, ALLEGRO_COLOR color, float x, float y,
                     float xscale, float yscale, int alignment, const char* text) {
   ALLEGRO_TRANSFORM transform;
@@ -163,48 +170,68 @@ void Render(Renderer* renderer, Jogador* jogador, Inimigo* inimigos, int qtd_ini
   al_flip_display();
 }
 
+void DrawKeyVisual(Renderer* r, float x, float y, int w, const char* keyText, const char* descText) {
+    int h = 60;
+    int shadow_offset = 5;
+    int text_scale = 2.0;
+
+    al_draw_filled_rounded_rectangle(x, y + shadow_offset, x + w, y + h + shadow_offset, 8, 8, COLOR_KEY_SHADOW);
+
+    al_draw_filled_rounded_rectangle(x, y, x + w, y + h, 8, 8, COLOR_KEY_FACE);
+    
+    al_draw_rounded_rectangle(x, y, x + w, y + h, 8, 8, al_map_rgb(0,0,0), 3);
+
+    DrawScaledText(r->font, COLOR_KEY_TEXT, (x + w/2)/text_scale, (y + h/4)/text_scale, text_scale, text_scale, ALLEGRO_ALIGN_CENTRE, keyText);
+
+    DrawScaledText(r->font, COLOR_DESC_TEXT, (x + w + 30)/text_scale, (y + h/4)/text_scale, text_scale, text_scale, ALLEGRO_ALIGN_LEFT, descText);
+}
+
+void RenderMenu(Renderer* renderer) {
+    al_set_target_bitmap(renderer->display_buffer);
+    al_clear_to_color(COLOR_BG);
+
+    DrawScaledText(renderer->font, COLOR_GOLD, 
+                   DISPLAY_BUFFER_WIDTH/2.0/5.0, 15, 
+                   5.0, 5.0, ALLEGRO_ALIGN_CENTRE, "SLAY THE SPIRE (CLONE)");
+
+    float start_y_nav = 320; 
+    float col1_x = 150;
+    int key_size_std = 70;
+
+    DrawScaledText(renderer->font, COLOR_GOLD, col1_x/2.5, (start_y_nav - 60)/2.5, 2.5, 2.5, ALLEGRO_ALIGN_LEFT, "NAVEGACAO");
+
+    DrawKeyVisual(renderer, col1_x, start_y_nav, key_size_std, "<", "Carta Anterior");
+    DrawKeyVisual(renderer, col1_x, start_y_nav + 80, key_size_std, ">", "Proxima Carta");
+    DrawKeyVisual(renderer, col1_x, start_y_nav + 160, key_size_std, "^", "Trocar Alvo (Inimigo)");
+    
+    float col2_x = DISPLAY_BUFFER_WIDTH/2.0 + 50;
+    float start_y_act = 320;
+
+    DrawScaledText(renderer->font, COLOR_GOLD, col2_x/2.5, (start_y_act - 60)/2.5, 2.5, 2.5, ALLEGRO_ALIGN_LEFT, "ACOES");
+
+    DrawKeyVisual(renderer, col2_x, start_y_act, 160, "ENTER", "Jogar Carta Selecionada");
+    DrawKeyVisual(renderer, col2_x, start_y_act + 80, key_size_std, "E", "Encerrar Turno");
+    
+    DrawScaledText(renderer->font, al_map_rgb(150,150,150), col2_x/2.0, (start_y_act + 180)/2.0, 2.0, 2.0, ALLEGRO_ALIGN_LEFT, "Cheats (Debug):");
+    DrawKeyVisual(renderer, col2_x, start_y_act + 220, key_size_std, "C", "Curar Vida");
+    DrawKeyVisual(renderer, col2_x, start_y_act + 300, 160, "SPACE", "Matar Todos Inimigos");
+
+    float footer_y = DISPLAY_BUFFER_HEIGHT - 80;
+    float text_scale_footer = 1.5;
+
+    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), 
+                   DISPLAY_BUFFER_WIDTH/2.0/text_scale_footer, footer_y/text_scale_footer, 
+                   text_scale_footer, text_scale_footer, ALLEGRO_ALIGN_CENTRE, "PRESSIONE [ ENTER ] PARA INICIAR");
+
+    al_set_target_backbuffer(renderer->display);
+    al_draw_scaled_bitmap(renderer->display_buffer, 0, 0, DISPLAY_BUFFER_WIDTH,
+                        DISPLAY_BUFFER_HEIGHT, 0, 0, DISPLAY_WIDTH,
+                        DISPLAY_HEIGHT, 0);
+    al_flip_display();
+}
+
 void ClearRenderer(Renderer* renderer) {
   al_destroy_display(renderer->display);
   al_destroy_bitmap(renderer->display_buffer);
   al_destroy_font(renderer->font);
-}
-
-void RenderMenu(Renderer* renderer) {
-    al_clear_to_color(al_map_rgb(30, 20, 40));
-
-    DrawScaledText(renderer->font, al_map_rgb(255, 215, 0), 
-                   DISPLAY_WIDTH/2, 100, 
-                   5.0, 5.0, ALLEGRO_ALIGN_CENTRE, "SLAY THE SPIRE (CLONE)");
-
-    float x_mec = 200;
-    float y = 300;
-    
-    DrawScaledText(renderer->font, al_map_rgb(200, 200, 255), x_mec, y, 2.5, 2.5, ALLEGRO_ALIGN_CENTRE, "--- MECANICAS ---");
-    y += 50;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "ENERGIA: Voce tem 3 por turno");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "CARTAS: Ataque ou Defesa");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "ESCUDO: Protege contra dano");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), x_mec, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "INIMIGOS: Observe a intencao!");
-
-    float x_ctrl = DISPLAY_WIDTH - 300;
-    y = 300;
-
-    DrawScaledText(renderer->font, al_map_rgb(200, 200, 255), x_ctrl, y, 2.5, 2.5, ALLEGRO_ALIGN_CENTRE, "--- CONTROLES ---");
-    y += 50;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ SETAS < > ] : Selecionar Carta");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ SETAS ^ v ] : Selecionar Alvo");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ ENTER ] : Jogar Carta");
-    y += 40;
-    DrawScaledText(renderer->font, al_map_rgb(255, 255, 0), x_ctrl, y, 1.5, 1.5, ALLEGRO_ALIGN_CENTRE, "[ E ] : Encerrar Turno");
-
-    DrawScaledText(renderer->font, al_map_rgb(0, 255, 0), 
-                   DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 100, 
-                   3.0, 3.0, ALLEGRO_ALIGN_CENTRE, "PRESSIONE [ ENTER ] PARA COMECAR");
-
-    al_flip_display();
 }
